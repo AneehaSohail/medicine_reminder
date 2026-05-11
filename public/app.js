@@ -35,6 +35,27 @@ async function markTaken(id) {
   loadMedicines();
 }
 
+function showMissedForm(id) {
+  const form = document.getElementById(`missed-form-${id}`);
+  form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+async function saveMissedTime(id) {
+  const hour = document.getElementById(`hour-${id}`).value;
+  const minute = document.getElementById(`minute-${id}`).value;
+  const period = document.getElementById(`period-${id}`).value;
+
+  await fetch(`/api/medicines/${id}/custom-time`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ hour, minute, period })
+  });
+
+  loadMedicines();
+}
+
 async function loadMedicines() {
   const medicines = await fetchMedicines();
   medicineList.innerHTML = "";
@@ -44,20 +65,60 @@ async function loadMedicines() {
     const now = new Date();
     const isDue = now >= nextDose;
 
+    const hourOptions = Array.from({ length: 12 }, (_, i) => {
+      const hour = i + 1;
+      return `<option value="${hour}">${hour}</option>`;
+    }).join("");
+
+    const minuteOptions = ["00", "15", "30", "45"].map(min => {
+      return `<option value="${min}">${min}</option>`;
+    }).join("");
+
     const card = document.createElement("div");
     card.className = "card";
 
     card.innerHTML = `
       <h2>${med.name}</h2>
+
       <p class="info">Take every ${med.intervalHours} hours</p>
       <p class="info">Last taken: ${formatTime(new Date(med.lastTaken))}</p>
+
       <p class="${isDue ? "due" : "next"}">
         ${isDue ? "Time to take now" : "Next dose: " + formatTime(nextDose)}
       </p>
+
       <p class="info">Duration: ${med.durationDays} days</p>
+
       <button class="taken" onclick="markTaken(${med.id})">
-        I took this medicine
+        I took it now
       </button>
+
+      <button class="missed" onclick="showMissedForm(${med.id})">
+        I took it at missed time
+      </button>
+
+      <div class="missed-form" id="missed-form-${med.id}" style="display:none;">
+        <p class="info">Select the time you actually took it:</p>
+
+        <div class="time-row">
+          <select id="hour-${med.id}">
+            ${hourOptions}
+          </select>
+
+          <select id="minute-${med.id}">
+            ${minuteOptions}
+          </select>
+
+          <select id="period-${med.id}">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
+
+        <button class="save-time" onclick="saveMissedTime(${med.id})">
+          Save this time
+        </button>
+      </div>
     `;
 
     medicineList.appendChild(card);
