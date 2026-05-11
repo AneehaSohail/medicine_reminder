@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Celebrex",
+    "intervalHours": 12,
+    "lastTaken": "2026-05-11T07:30:00",
+    "durationDays": 7
+  },
+  {
+    "id": 2,
+    "name": "Panadol",
+    "intervalHours": 8,
+    "lastTaken": "2026-05-11T04:00:00",
+    "durationDays": 7
+  },
+  {
+    "id": 3,
+    "name": "Amoxicil",
+    "intervalHours": 12,
+    "lastTaken": "2026-05-11T11:00:00",
+    "durationDays": 7
+  }
+]
